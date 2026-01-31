@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Telas Artísticas</title>
+    <style>
+        :root { --primary: #4a90e2; --success: #2ecc71; --warning: #f39c12; --danger: #e74c3c; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding-top: 50px; }
+        .container { background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+        h2 { color: var(--primary); text-align: center; margin-bottom: 25px; font-size: 28px; }
+        
+        /* Buscador */
+        .search-container { display: flex; gap: 10px; margin-bottom: 30px; }
+        input[type="text"] { flex-grow: 1; padding: 12px 15px; border: 2px solid #eee; border-radius: 10px; outline: none; transition: border-color 0.3s; font-size: 16px; }
+        input[type="text"]:focus { border-color: var(--primary); }
+        .btn-search { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        
+        /* Resultados */
+        .result-section { border-top: 2px solid #f9f9f9; padding-top: 20px; animation: fadeIn 0.5s; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .paid { background: #eafff2; color: var(--success); }
+        .pending { background: #fff1f0; color: var(--danger); }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; color: #888; font-size: 14px; padding: 10px; border-bottom: 1px solid #eee; }
+        td { padding: 12px 10px; border-bottom: 1px solid #f9f9f9; }
+
+        /* Botones de Navegación */
+        .nav-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 40px; }
+        .nav-btn { text-decoration: none; padding: 15px; text-align: center; border-radius: 12px; color: white; font-weight: bold; transition: opacity 0.3s; }
+        .nav-btn:hover { opacity: 0.9; }
+        .bg-reg { background: var(--success); }
+        .bg-pay { background: var(--warning); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎨 Panel de Telas</h2>
+
+        <form method="GET" action="/" class="search-container">
+            <input type="text" name="q" placeholder="Buscar alumna (ej: Ana Paula)..." value="{{ query|default:'' }}" autofocus>
+            <button type="submit" class="btn-search">Buscar</button>
+        </form>
+
+        {% if alumna %}
+            <div class="result-section">
+                <h3 style="margin-bottom: 5px;">{{ alumna.nombre }} {{ alumna.apellido }}</h3>
+                <p style="color: #666; font-size: 14px; margin-top: 0;">Tel: {{ alumna.telefono }}</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mes / Año</th>
+                            <th>Estado de Cuota</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in cuotas %}
+                        <tr>
+                            <td>{{ c.get_mes_display }} {{ c.anio }}</td>
+                            <td>
+                                {% if c.pagado %}
+                                    <span class="status-badge paid">Pagado ✅</span>
+                                {% else %}
+                                    <span class="status-badge pending">Pendiente ❌</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2" style="text-align: center; color: #999;">Sin cuotas cargadas.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% elif query %}
+            <div class="result-section" style="text-align: center; color: #e74c3c;">
+                No se encontró a "{{ query }}". Verifica el nombre.
+            </div>
+        {% endif %}
+
+        <div class="nav-buttons">
+            <a href="{% url 'registrar_alumna' %}" class="nav-btn bg-reg">+ Nueva Alumna</a>
+            <a href="{% url 'cargar_cuota' %}" class="nav-btn bg-pay">$ Cargar Pago</a>
+        </div>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="/admin" style="color: #bbb; text-decoration: none; font-size: 12px;">Acceso administrativo</a>
+        </p>
+    </div>
+</body>
+</html>

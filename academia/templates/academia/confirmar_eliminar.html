@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Eliminación - Sistema de Telas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #13a8e1;
+            --primary-dark: #0e5c9f;
+            --accent: #9519c2;
+            --success: #2ecc71;
+            --warning: #ce6951;
+            --danger: #e74c3c;
+            --light: #efe4f3;
+            --gray: #799cba;
+            --text: #050607;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light) 0%, #e8ecf1 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border: 2px solid var(--danger);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .alert-warning h2 {
+            color: var(--danger);
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-warning p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .alumna-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .alumna-info strong {
+            color: var(--primary);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #687a8e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        @media (max-width: 500px) {
+            .container { padding: 25px; }
+            .alert-warning h2 { font-size: 20px; }
+            .button-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="alert-warning">
+            <h2>⚠️ Confirmar Eliminación</h2>
+            <p>Estás a punto de eliminar a:</p>
+            <div class="alumna-info">
+                <strong>{{ alumna.nombre }} {{ alumna.apellido }}</strong><br>
+                Teléfono: {{ alumna.telefono|default:"No registrado" }}<br>
+                Turno: {{ alumna.turno|default:"No especificado" }}
+            </div>
+            <p style="color: var(--danger); font-weight: bold;">⚠️ Esta acción no se puede deshacer.<br>Se eliminarán también todas sus cuotas.</p>
+        </div>
+
+        <form method="POST" style="margin-bottom: 20px;">
+            {% csrf_token %}
+            <div class="button-group">
+                <button type="submit" class="btn btn-danger">🗑️ Eliminar</button>
+                <a href="/" class="btn btn-secondary">← Cancelar</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

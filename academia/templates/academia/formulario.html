@@ -1,0 +1,369 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }} - Sistema de Telas</title>
+    <link rel="stylesheet" href="{% static 'academia/css/main.css' %}">>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #13a8e1;
+            --primary-dark: #0e5c9f;
+            --accent: #9519c2;
+            --success: #52b788;
+            --danger: #d66a6a;
+            --light: #efe4f3;
+            --gray: #799cba;
+            --text: #0a0a0a;
+            --text-secondary: #1a1a1a;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light) 0%, #e8ecf1 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text);
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: var(--primary-dark);
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.3s ease;
+            color: var(--text);
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(19, 168, 225, 0.15);
+            background: #f9fbfd;
+        }
+        
+        /* Checkbox para pagado */
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .form-check input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+        
+        .form-check label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        /* Botones */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        button[type="submit"],
+        .btn-submit {
+            flex: 1;
+            background: linear-gradient(135deg, var(--success) 0%, #45a876 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(82, 183, 136, 0.3);
+        }
+        
+        button[type="submit"]:hover,
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(82, 183, 136, 0.4);
+        }
+        
+        .btn-cancel {
+            flex: 1;
+            background: #e8e8e8;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-cancel:hover {
+            background: #d0d0d0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        /* Errores */
+        .errorlist {
+            background: #ffe8e8;
+            border: 2px solid var(--danger);
+            color: #d9534f;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            list-style: none;
+        }
+        
+        .errorlist li {
+            margin-bottom: 5px;
+        }
+        
+        .errorlist li:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Mensaje de éxito */
+        .success-message {
+            background: #e8f8f0;
+            border: 2px solid var(--success);
+            color: #5a9e7d;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .form-help {
+            font-size: 13px;
+            color: var(--gray);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px 20px;
+            }
+            
+            h1 {
+                font-size: 26px;
+            }
+            
+            label {
+                font-size: 14px;
+            }
+            
+            input, select, textarea {
+                font-size: 16px !important;
+                padding: 12px 14px;
+            }
+            
+            .button-group {
+                gap: 10px;
+            }
+            
+            button, .btn-submit, .btn-cancel {
+                padding: 13px 18px;
+                font-size: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px 12px;
+                max-width: 100%;
+                margin: 0;
+                border-radius: 10px;
+            }
+            
+            body {
+                padding: 8px;
+            }
+            
+            h1 {
+                font-size: 22px;
+                margin-bottom: 15px;
+            }
+            
+            .form-group {
+                margin-bottom: 18px;
+            }
+            
+            label {
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+            
+            input[type="text"],
+            input[type="email"],
+            input[type="tel"],
+            input[type="date"],
+            input[type="number"],
+            select,
+            textarea {
+                padding: 12px 12px;
+                font-size: 16px !important;
+                border-radius: 10px;
+            }
+            
+            .form-check {
+                gap: 10px;
+            }
+            
+            .form-check input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 25px;
+            }
+            
+            button[type="submit"],
+            .btn-submit,
+            .btn-cancel {
+                width: 100%;
+                padding: 12px 16px;
+                font-size: 14px;
+                border-radius: 10px;
+            }
+            
+            .errorlist {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+            
+            .form-help {
+                font-size: 12px;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 {{ titulo }}</h1>
+            {% if alumna_preseleccionada %}
+                <p style="color: var(--success); font-size: 14px; font-weight: 700; margin-top: 8px;">
+                    ✅ Alumna: <strong>{{ alumna_preseleccionada.nombre }} {{ alumna_preseleccionada.apellido }}</strong>
+                </p>
+            {% endif %}
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Mostrar errores si existen -->
+            {% if form.non_field_errors %}
+                <div class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Renderizar campos del formulario -->
+            {% for field in form %}
+                <div class="form-group">
+                    {% if field.field.widget.input_type == "checkbox" %}
+                        <div class="form-check">
+                            {{ field }}
+                            {{ field.label }}
+                        </div>
+                    {% else %}
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="errorlist">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <p class="form-help">{{ field.help_text|safe }}</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="button-group">
+                <button type="submit">✅ Guardar</button>
+                <a href="/" class="btn-cancel">← Volver</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

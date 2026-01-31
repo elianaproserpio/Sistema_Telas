@@ -1,0 +1,361 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Alumnas - Sistema de Telas</title>
+    <link rel="stylesheet" href="{% static 'academia/css/main.css' %}">
+    <style>
+        .alumnas-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .alumnas-table thead {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #f5f5f5;
+        }
+
+        .alumnas-table th {
+            text-align: left;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 16px 14px;
+            border-bottom: 2px solid var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .alumnas-table td {
+            padding: 14px;
+            border-bottom: 1px solid #f0f0f0;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .alumnas-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .alumnas-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .alumna-nombre {
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .alumna-turno {
+            color: var(--gray);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .estado-pagado {
+            background: #e8f5e9;
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .estado-pendiente {
+            background: #fff3e0;
+            color: #e6821c;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .estado-sin-cuota {
+            background: #f5f5f5;
+            color: var(--gray);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .alumna-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(19, 168, 225, 0.2);
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #b94040;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(214, 106, 106, 0.2);
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 12px 20px;
+            background: var(--gray);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #5a7b99;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+            font-size: 16px;
+        }
+
+        .empty-message strong {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .stats-bar {
+            background: linear-gradient(135deg, var(--light) 0%, #e8ecf1 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .alumnas-table {
+                font-size: 12px;
+            }
+
+            .alumnas-table th,
+            .alumnas-table td {
+                padding: 10px 8px;
+            }
+
+            .alumna-actions {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .btn-action {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .alumnas-table {
+                font-size: 11px;
+            }
+
+            .alumnas-table th,
+            .alumnas-table td {
+                padding: 8px 6px;
+            }
+
+            .alumna-nombre {
+                font-size: 12px;
+            }
+
+            .alumna-turno {
+                font-size: 10px;
+            }
+
+            .alumna-actions {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .btn-action {
+                padding: 4px 8px;
+                font-size: 10px;
+                width: 100%;
+            }
+
+            .back-button {
+                width: 100%;
+                text-align: center;
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .stat-number {
+                font-size: 20px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="{% static 'academia/images/logo.jpg' %}" alt="Logo Cola y Kite" onerror="this.parentElement.innerHTML='<div class=&quot;logo-placeholder&quot;>🎨</div>'">
+                </div>
+                <div>
+                    <h1>Colgarte</h1>
+                    <p class="subtitle">Gestión de Alumnas y Cuotas</p>
+                </div>
+            </div>
+        </div>
+
+        <a href="{% url 'buscar' %}" class="back-button">⬅️ Volver al Inicio</a>
+
+        <h2 style="color: var(--primary-dark); font-size: 24px; margin-bottom: 20px; font-weight: 700;">👥 Listado de Alumnas por Turno</h2>
+
+        {% if alumnas_por_turno %}
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_alumnas }}</span>
+                    <span class="stat-label">Total de Alumnas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ alumnas_por_turno|length }}</span>
+                    <span class="stat-label">Turnos Activos</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Colgarte</span>
+                    <span class="stat-number" style="font-size: 20px; color: var(--success);">✅ Activo</span>
+                </div>
+            </div>
+
+            {% for turno, alumnas in alumnas_por_turno.items %}
+            <div style="margin-bottom: 30px;">
+                <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
+                            color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 15px;
+                            display: flex; align-items: center; justify-content: space-between;">
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">
+                        ⏰ {{ turno }}
+                    </h3>
+                    <span style="background: rgba(255,255,255,0.3); padding: 4px 12px; border-radius: 20px;
+                                 font-size: 12px; font-weight: 700;">
+                        {{ alumnas|length }} alumnas
+                    </span>
+                </div>
+
+                <table class="alumnas-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Teléfono</th>
+                            <th>Cuota Actual</th>
+                            <th>Fecha Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alumna in alumnas %}
+                        <tr>
+                            <td>
+                                <div class="alumna-nombre">{{ alumna.nombre }} {{ alumna.apellido }}</div>
+                            </td>
+                            <td>{{ alumna.telefono|default:"N/A" }}</td>
+                            <td>
+                                {% with cuota=alumna.get_cuota_actual %}
+                                    {% if cuota %}
+                                        {% if cuota.pagado %}
+                                            <span class="estado-pagado">✅ Pagado</span>
+                                        {% else %}
+                                            <span class="estado-pendiente">⏳ Pendiente</span>
+                                        {% endif %}
+                                        <div style="font-size: 11px; color: var(--gray); margin-top: 4px;">
+                                            {{ cuota.get_mes_display }} / {{ cuota.anio }}
+                                        </div>
+                                    {% else %}
+                                        <span class="estado-sin-cuota">Sin cuota</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td style="font-size: 12px; color: var(--gray);">{{ alumna.fecha_registro|date:"d/m/Y" }}</td>
+                            <td>
+                                <div class="alumna-actions">
+                                    <a href="{% url 'editar_alumna' alumna.id %}" class="btn-action btn-edit">✏️ Editar</a>
+                                    <a href="{% url 'eliminar_alumna' alumna.id %}" class="btn-action btn-delete">🗑️ Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-message">
+                <strong>No hay alumnas registradas</strong>
+                <p>Comienza creando una nueva alumna desde el botón "Nueva Alumna"</p>
+            </div>
+        {% endif %}

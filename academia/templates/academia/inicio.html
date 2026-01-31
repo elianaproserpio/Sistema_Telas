@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Telas - Registro de Alumnas</title>
+    <link rel="stylesheet" href="{% static 'academia/css/main.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="{% static 'academia/images/logo.jpg' %}" alt="Logo Cola y Kite" onerror="this.parentElement.innerHTML='<div class=&quot;logo-placeholder&quot;>🎨</div>'">
+                </div>
+                <div>
+                    <h1>Colgarte</h1>
+                    <p class="subtitle">Gestión de Alumnas y Cuotas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mostrar Mensajes de Éxito/Error -->
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {% if message.tags %}success{% else %}error{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Buscador -->
+        <form method="GET" action="/" class="search-container">
+            <input type="text" name="q" placeholder="Buscar alumna por nombre o apellido..." value="{{ query|default:'' }}" autofocus>
+            <button type="submit" class="btn-search">🔍 Buscar</button>
+        </form>
+
+        <!-- Resultados de Búsqueda -->
+        {% if alumna %}
+            <div class="result-section">
+                <div class="alumna-info">
+                    <div class="alumna-name">{{ alumna.nombre }} {{ alumna.apellido }}</div>
+                    <div class="alumna-details">
+                        <div><strong>📱 Teléfono:</strong> {{ alumna.telefono|default:"No registrado" }}</div>
+                        <div><strong>⏰ Turno:</strong> {{ alumna.get_turno_display|default:"No especificado" }}</div>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="{% url 'editar_alumna' alumna.id %}">✏️ Editar</a>
+                        <a href="{% url 'eliminar_alumna' alumna.id %}">🗑️ Eliminar</a>
+                    </div>
+                </div>
+                
+                {% if cuotas %}
+                    <h3 style="margin-top: 25px; margin-bottom: 15px; color: var(--primary-dark); font-size: 18px; font-weight: 700;">💰 Registro de Cuotas</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mes / Año</th>
+                                <th>Monto</th>
+                                <th>Método</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in cuotas %}
+                            <tr>
+                                <td><strong>{{ c.get_mes_display }} {{ c.anio }}</strong></td>
+                                <td><strong>${{ c.monto }}</strong></td>
+                                <td>{{ c.get_metodo_pago_display }}</td>
+                                <td>
+                                    {% if c.pagado %}
+                                        <span class="status-badge paid">✅ Pagado</span>
+                                    {% else %}
+                                        <span class="status-badge pending">❌ Pendiente</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">
+                        ℹ️ Sin cuotas registradas para esta alumna.
+                    </div>
+                {% endif %}
+            </div>
+        
+        {% elif query %}
+            <div class="not-found">
+                ❌ No se encontró a <strong>"{{ query }}"</strong>. Verifica el nombre e intenta nuevamente.
+            </div>
+        {% else %}
+            <div class="empty-state">
+                👋 Bienvenida al Sistema de colgarte<br>
+                Busca una alumna o crea una nueva.
+            </div>
+        {% endif %}
+
+        <!-- Botones de Acción -->
+        <div class="nav-buttons">
+            <a href="{% url 'registrar_alumna' %}" class="nav-btn bg-add">➕ Nueva Alumna</a>
+            {% if alumna %}
+                <a href="{% url 'cargar_cuota' %}?alumna_id={{ alumna.id }}" class="nav-btn bg-pay">💰 Cargar Pago</a>
+            {% else %}
+                <a href="{% url 'cargar_cuota' %}" class="nav-btn bg-pay">💰 Cargar Pago</a>
+            {% endif %}
+            <a href="{% url 'listar_alumnas' %}" class="nav-btn bg-list">👥 Ver Alumnas</a>
+            <a href="{% url 'gestionar_pagos' %}" class="nav-btn bg-payments">💳 Gestionar Pagos</a>
+        </div>
+    </div>
+</body>
+</html>
