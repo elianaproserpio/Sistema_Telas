@@ -17,6 +17,12 @@ class CuotaForm(forms.ModelForm):
     class Meta:
         model = Cuota
         fields = ['alumna', 'mes', 'anio', 'monto', 'metodo_pago', 'pagado', 'fecha_pago']
+        # AGREGAMOS ESTO PARA LA Ñ
+        labels = {
+            'anio': 'Año',
+            'metodo_pago': 'Método de pago',
+            'pagado': '¿Está pagado?',
+        }
         widgets = {
             'alumna': forms.Select(attrs={'class': 'form-input'}),
             'mes': forms.Select(attrs={'class': 'form-input'}),
@@ -32,6 +38,11 @@ class CuotaEditForm(forms.ModelForm):
     class Meta:
         model = Cuota
         fields = ['mes', 'anio', 'monto', 'metodo_pago', 'pagado', 'fecha_pago']
+        # TAMBIÉN AQUÍ PARA QUE AL EDITAR SE VEA BIEN
+        labels = {
+            'anio': 'Año',
+            'metodo_pago': 'Método de pago',
+        }
         widgets = {
             'mes': forms.Select(attrs={'class': 'form-input'}),
             'anio': forms.NumberInput(attrs={'class': 'form-input', 'min': '2020'}),
