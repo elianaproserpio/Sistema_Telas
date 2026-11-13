@@ -451,11 +451,11 @@ tr:hover {
 
 .bg-turnos {
     grid-column: 1 / -1;
-    background: linear-gradient(135deg, #e3d7f7 0%, #d6c6f3 100%);
+    background: linear-gradient(135deg, #d4c2f4 0%, #c3abee 100%);
 }
 
 .bg-turnos:hover {
-    background: linear-gradient(135deg, #d6c6f3 0%, #c9b6ee 100%);
+    background: linear-gradient(135deg, #c3abee 0%, #b398e6 100%);
 }
 
 /* Resultados de búsqueda del inicio */
