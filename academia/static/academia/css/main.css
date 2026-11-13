@@ -7,9 +7,9 @@
     --primary: #9d80d6;
     --primary-dark: #6f52a8;
     --accent: #f2a48f;
-    --success: #5aae8a;
-    --warning: #e9a15f;
-    --danger: #e0817c;
+    --success: #3d8a69;
+    --warning: #b8692a;
+    --danger: #b8504a;
     --light: #f6f0fc;
     --gray: #8f86a8;
     --gray-light: #cdc6dd;
@@ -137,7 +137,7 @@ h1 {
 .message.success {
     background: #ecf8f2;
     border-color: var(--success);
-    color: #4f9e7c;
+    color: #2f7a57;
 }
 
 .message.error {
@@ -255,7 +255,7 @@ input[type="text"]:focus {
 }
 
 .alumna-details strong {
-    color: var(--primary);
+    color: var(--primary-dark);
     font-weight: 700;
 }
 
@@ -342,7 +342,7 @@ tr:hover {
 
 .paid {
     background: linear-gradient(135deg, #ecf8f2 0%, #dcf3e8 100%);
-    color: #4f9e7c;
+    color: #2f7a57;
     box-shadow: 0 2px 8px rgba(127, 207, 171, 0.2);
 }
 
@@ -533,7 +533,7 @@ tr:hover {
 }
 
 .admin-link a:hover {
-    color: var(--primary);
+    color: var(--primary-dark);
 }
 
 /* ====================================

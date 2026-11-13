@@ -8,6 +8,7 @@ from .forms import AlumnaForm, CuotaForm, CuotaEditForm, TurnoForm
 from django.contrib import messages
 from django.db import IntegrityError
 from django.db.models import Count
+from django.db.models.functions import Lower
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
@@ -24,7 +25,7 @@ def buscar_alumnas(query):
     if not palabras:
         return []
     coincidencias = []
-    for alumna in Alumna.objects.select_related('turno').order_by('nombre', 'apellido'):
+    for alumna in Alumna.objects.select_related('turno').order_by(Lower('nombre'), Lower('apellido')):
         texto = normalizar(f'{alumna.nombre} {alumna.apellido}')
         if all(p in texto for p in palabras):
             coincidencias.append(alumna)
@@ -199,12 +200,12 @@ def listar_alumnas(request):
     # Agrupar alumnas por turno (en el orden definido en la pantalla de Turnos)
     alumnas_por_turno = {}
     for turno in Turno.objects.all():
-        alumnas = Alumna.objects.filter(turno=turno).order_by('nombre', 'apellido')
+        alumnas = Alumna.objects.filter(turno=turno).order_by(Lower('nombre'), Lower('apellido'))
         if alumnas.exists():
             alumnas_por_turno[turno.nombre] = alumnas
 
     # También incluir alumnas sin turno
-    sin_turno = Alumna.objects.filter(turno__isnull=True).order_by('nombre', 'apellido')
+    sin_turno = Alumna.objects.filter(turno__isnull=True).order_by(Lower('nombre'), Lower('apellido'))
     if sin_turno.exists():
         alumnas_por_turno['Sin turno especificado'] = sin_turno
     
@@ -251,7 +252,7 @@ def gestionar_pagos(request):
         return lista
 
     alumnas_por_turno = {}
-    for alumna in Alumna.objects.order_by('nombre', 'apellido'):
+    for alumna in Alumna.objects.order_by(Lower('nombre'), Lower('apellido')):
         alumnas_por_turno.setdefault(alumna.turno_id, []).append(alumna)
 
     for turno in Turno.objects.all():

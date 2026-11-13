@@ -1,5 +1,6 @@
 from django import forms
 from django.db.models import Q
+from django.db.models.functions import Lower
 from .models import Alumna, Cuota, Turno
 
 # Cambiamos ModelSerializer por ModelForm
@@ -62,7 +63,7 @@ class CuotaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Alumnas en orden alfabético para encontrarlas más fácil
-        self.fields['alumna'].queryset = Alumna.objects.order_by('nombre', 'apellido')
+        self.fields['alumna'].queryset = Alumna.objects.order_by(Lower('nombre'), Lower('apellido'))
         self.fields['alumna'].empty_label = 'Elegí una alumna'
 
 # Formulario para editar cuotas directamente

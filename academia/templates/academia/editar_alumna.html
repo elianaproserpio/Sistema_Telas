@@ -12,9 +12,9 @@
             --primary: #9d80d6;
             --primary-dark: #6f52a8;
             --accent: #f2a48f;
-            --success: #5aae8a;
-            --warning: #e9a15f;
-            --danger: #e0817c;
+            --success: #3d8a69;
+            --warning: #b8692a;
+            --danger: #b8504a;
             --light: #f6f0fc;
             --gray: #8f86a8;
             --text: #3a3150;
@@ -155,6 +155,7 @@
         }
         
         th {
+            color: #3b2a5a;
             text-align: left;
             font-size: 13px;
             font-weight: 700;
@@ -304,7 +305,7 @@
         .success {
             background: #ecf8f2;
             border-color: var(--success);
-            color: #4f9e7c;
+            color: #2f7a57;
         }
         
         .error {
@@ -611,7 +612,7 @@
                             <td><strong>{{ c.get_mes_display }} {{ c.anio }}</strong></td>
                             <td>${{ c.monto }}</td>
                             <td>
-                                <span style="background: #eaf5fc; color: var(--primary); padding: 4px 10px; 
+                                <span style="background: #eaf5fc; color: var(--primary-dark); padding: 4px 10px; 
                                              border-radius: 15px; font-size: 11px; font-weight: 700;">
                                     {{ c.get_metodo_pago_display }}
                                 </span>
@@ -639,7 +640,7 @@
                 <h2>💰 Cuotas y Pagos</h2>
                 <div class="empty-state">
                     ℹ️ Sin cuotas registradas para esta alumna.
-                    <a href="{% url 'cargar_cuota' %}?alumna_id={{ alumna.id }}" style="display: block; margin-top: 15px; color: var(--primary); text-decoration: none; font-weight: bold;">
+                    <a href="{% url 'cargar_cuota' %}?alumna_id={{ alumna.id }}" style="display: block; margin-top: 15px; color: var(--primary-dark); text-decoration: none; font-weight: bold;">
                         ➕ Agregar Cuota
                     </a>
                 </div>

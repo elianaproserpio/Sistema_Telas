@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestionar Pagos - Sistema de Telas</title>
-    <link rel="stylesheet" href="{% static 'academia/css/main.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'academia/css/main.css' %}?v=3">
     <style>
         .pagos-table {
             width: 100%;
@@ -23,6 +23,7 @@
         }
 
         .pagos-table th {
+            color: #3b2a5a;
             text-align: left;
             font-size: 13px;
             font-weight: 700;
@@ -64,7 +65,7 @@
 
         .estado-pendiente {
             background: #fff3e0;
-            color: #d98a3d;
+            color: #a8601f;
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
@@ -421,14 +422,14 @@
             </td>
             <td>
                 {% if item.cuota_mes_seleccionado %}
-                    <strong style="color: var(--primary); font-size: 15px;">${{ item.cuota_mes_seleccionado.monto }}</strong>
+                    <strong style="color: var(--primary-dark); font-size: 15px;">${{ item.cuota_mes_seleccionado.monto }}</strong>
                 {% else %}
-                    <strong style="color: var(--primary); font-size: 15px;">-</strong>
+                    <strong style="color: var(--primary-dark); font-size: 15px;">-</strong>
                 {% endif %}
             </td>
             <td>
                 {% if item.cuota_mes_seleccionado %}
-                    <span style="background: #eaf5fc; color: var(--primary); padding: 6px 12px; 
+                    <span style="background: #eaf5fc; color: var(--primary-dark); padding: 6px 12px; 
                                  border-radius: 15px; font-size: 11px; font-weight: 700;">
                         {{ item.cuota_mes_seleccionado.get_metodo_pago_display }}
                     </span>
