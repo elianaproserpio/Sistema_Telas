@@ -1,5 +1,6 @@
 from django import forms
-from .models import Alumna, Cuota
+from django.db.models import Q
+from .models import Alumna, Cuota, Turno
 
 # Cambiamos ModelSerializer por ModelForm
 class AlumnaForm(forms.ModelForm):
@@ -11,6 +12,31 @@ class AlumnaForm(forms.ModelForm):
             'apellido': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Apellido'}),
             'turno': forms.Select(attrs={'class': 'form-input'}),
             'telefono': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Teléfono'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Solo turnos activos; si la alumna ya tiene uno desactivado, se lo mantiene en la lista
+        filtro = Q(activo=True)
+        if self.instance and self.instance.turno_id:
+            filtro |= Q(pk=self.instance.turno_id)
+        self.fields['turno'].queryset = Turno.objects.filter(filtro)
+        self.fields['turno'].empty_label = 'Sin turno'
+
+
+class TurnoForm(forms.ModelForm):
+    class Meta:
+        model = Turno
+        fields = ['nombre', 'orden', 'activo']
+        labels = {
+            'nombre': 'Nombre del turno',
+            'orden': 'Orden',
+            'activo': 'Turno activo',
+        }
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Ej: Viernes 18:00 a 19:30'}),
+            'orden': forms.NumberInput(attrs={'class': 'form-input', 'min': '0'}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
         }
 
 class CuotaForm(forms.ModelForm):

@@ -1,18 +1,36 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 
+class Turno(models.Model):
+    """Turno de clase. Se crean, editan y desactivan desde la pantalla de Turnos."""
+    nombre = models.CharField(max_length=100, unique=True)
+    orden = models.PositiveIntegerField(
+        default=0,
+        help_text='Los turnos se muestran de menor a mayor según este número.',
+    )
+    activo = models.BooleanField(
+        default=True,
+        help_text='Si está desactivado, no aparece para asignar a nuevas alumnas.',
+    )
+
+    class Meta:
+        ordering = ['orden', 'nombre']
+
+    def __str__(self):
+        return self.nombre
+
+
 class Alumna(models.Model):
-    TURNOS = [
-        ('lunes_1', 'Lunes y Miércoles 18:30 a 19:30'),
-        ('lunes_2', 'Lunes y Miércoles 19:30 a 21:00'),
-        ('martes_1', 'Martes y Jueves 17:30 a 19:00'),
-        ('martes_2', 'Martes y Jueves 19:00 a 20:30'),
-    ]
-    
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20, blank=True)
-    turno = models.CharField(max_length=50, choices=TURNOS, blank=True)
+    turno = models.ForeignKey(
+        Turno,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='alumnas',
+    )
     fecha_registro = models.DateField(auto_now_add=True)
 
     def __str__(self):

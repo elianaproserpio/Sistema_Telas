@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Alumna, Cuota
-from .forms import AlumnaForm, CuotaForm, CuotaEditForm
+from .models import Alumna, Cuota, Turno
+from .forms import AlumnaForm, CuotaForm, CuotaEditForm, TurnoForm
 from django.contrib import messages
 from django.db import IntegrityError
+from django.db.models import Count
+from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 
 def buscar_alumna(request):
@@ -174,18 +177,15 @@ def cargar_cuota(request):
 
 def listar_alumnas(request):
     """Lista todas las alumnas registradas agrupadas por turno"""
-    # Obtener todos los turnos disponibles
-    turnos_choices = Alumna._meta.get_field('turno').choices
-    
-    # Agrupar alumnas por turno
+    # Agrupar alumnas por turno (en el orden definido en la pantalla de Turnos)
     alumnas_por_turno = {}
-    for turno_code, turno_display in turnos_choices:
-        alumnas = Alumna.objects.filter(turno=turno_code).order_by('nombre', 'apellido')
+    for turno in Turno.objects.all():
+        alumnas = Alumna.objects.filter(turno=turno).order_by('nombre', 'apellido')
         if alumnas.exists():
-            alumnas_por_turno[turno_display] = alumnas
-    
+            alumnas_por_turno[turno.nombre] = alumnas
+
     # También incluir alumnas sin turno
-    sin_turno = Alumna.objects.filter(turno='').order_by('nombre', 'apellido')
+    sin_turno = Alumna.objects.filter(turno__isnull=True).order_by('nombre', 'apellido')
     if sin_turno.exists():
         alumnas_por_turno['Sin turno especificado'] = sin_turno
     
@@ -199,7 +199,6 @@ def gestionar_pagos(request):
     """Vista para gestionar pagos de alumnas por turno"""
     from datetime import datetime
     
-    turnos_choices = Alumna._meta.get_field('turno').choices
     mes_actual = datetime.now().month
     anio_actual = datetime.now().year
     
@@ -213,8 +212,8 @@ def gestionar_pagos(request):
         'total_alumnas': Alumna.objects.count()
     }
     
-    for turno_code, turno_display in turnos_choices:
-        alumnas = Alumna.objects.filter(turno=turno_code).order_by('nombre', 'apellido')
+    for turno in Turno.objects.all():
+        alumnas = Alumna.objects.filter(turno=turno).order_by('nombre', 'apellido')
         if alumnas.exists():
             alumnas_con_cuota = []
             for alumna in alumnas:
@@ -233,10 +232,10 @@ def gestionar_pagos(request):
                 if cuota_mes_seleccionado and cuota_mes_seleccionado.pagado:
                     estadisticas['total_pagado_mes'] += cuota_mes_seleccionado.monto
             
-            pagos_por_turno[turno_display] = alumnas_con_cuota
-    
+            pagos_por_turno[turno.nombre] = alumnas_con_cuota
+
     # También incluir alumnas sin turno
-    sin_turno = Alumna.objects.filter(turno='').order_by('nombre', 'apellido')
+    sin_turno = Alumna.objects.filter(turno__isnull=True).order_by('nombre', 'apellido')
     if sin_turno.exists():
         alumnas_con_cuota = []
         for alumna in sin_turno:
@@ -274,4 +273,83 @@ def gestionar_pagos(request):
         'anios': anios,
         'mes_actual': mes_actual,
         'anio_actual': anio_actual
+    })
+
+# ---------------------------------------------------------------------------
+# Gestión de turnos
+# ---------------------------------------------------------------------------
+
+def listar_turnos(request):
+    """Lista los turnos con la cantidad de alumnas en cada uno"""
+    turnos = Turno.objects.annotate(cantidad_alumnas=Count('alumnas'))
+    return render(request, 'academia/listar_turnos.html', {
+        'turnos': turnos,
+        'sin_turno': Alumna.objects.filter(turno__isnull=True).count(),
+    })
+
+
+def crear_turno(request):
+    """Crea un turno nuevo"""
+    if request.method == 'POST':
+        form = TurnoForm(request.POST)
+        if form.is_valid():
+            turno = form.save()
+            messages.success(request, f'✅ Turno "{turno.nombre}" creado correctamente.')
+            return redirect('listar_turnos')
+    else:
+        siguiente_orden = (Turno.objects.order_by('-orden').values_list('orden', flat=True).first() or 0) + 1
+        form = TurnoForm(initial={'orden': siguiente_orden, 'activo': True})
+
+    return render(request, 'academia/formulario.html', {
+        'form': form,
+        'titulo': '⏰ Nuevo Turno',
+        'volver_url': reverse('listar_turnos'),
+    })
+
+
+def editar_turno(request, id):
+    """Edita el nombre, orden o estado de un turno"""
+    turno = get_object_or_404(Turno, id=id)
+
+    if request.method == 'POST':
+        form = TurnoForm(request.POST, instance=turno)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'✅ Turno "{turno.nombre}" actualizado correctamente.')
+            return redirect('listar_turnos')
+    else:
+        form = TurnoForm(instance=turno)
+
+    return render(request, 'academia/formulario.html', {
+        'form': form,
+        'titulo': '✏️ Editar Turno',
+        'volver_url': reverse('listar_turnos'),
+    })
+
+
+@require_POST
+def cambiar_estado_turno(request, id):
+    """Activa o desactiva un turno"""
+    turno = get_object_or_404(Turno, id=id)
+    turno.activo = not turno.activo
+    turno.save(update_fields=['activo'])
+    estado = 'activado' if turno.activo else 'desactivado'
+    messages.success(request, f'✅ Turno "{turno.nombre}" {estado}.')
+    return redirect('listar_turnos')
+
+
+def eliminar_turno(request, id):
+    """Elimina un turno, solo si no tiene alumnas asignadas"""
+    turno = get_object_or_404(Turno, id=id)
+    cantidad_alumnas = turno.alumnas.count()
+
+    if request.method == 'POST' and cantidad_alumnas == 0:
+        nombre = turno.nombre
+        turno.delete()
+        messages.success(request, f'✅ Turno "{nombre}" eliminado.')
+        return redirect('listar_turnos')
+
+    return render(request, 'academia/confirmar_eliminar_turno.html', {
+        'turno': turno,
+        'cantidad_alumnas': cantidad_alumnas,
     })

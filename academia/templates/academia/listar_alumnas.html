@@ -18,8 +18,8 @@
         }
 
         .alumnas-table thead {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: #f5f5f5;
+            background: linear-gradient(90deg, #e3d7f7 0%, #cfe7f5 100%);
+            color: #3b2a5a;
         }
 
         .alumnas-table th {
@@ -59,7 +59,7 @@
         }
 
         .estado-pagado {
-            background: #e8f5e9;
+            background: #e6f6ee;
             color: var(--success);
             padding: 6px 12px;
             border-radius: 20px;
@@ -70,7 +70,7 @@
 
         .estado-pendiente {
             background: #fff3e0;
-            color: #e6821c;
+            color: #d98a3d;
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 11px;
@@ -108,33 +108,33 @@
         }
 
         .btn-edit {
-            background: var(--primary);
-            color: white;
+            background: #d9cbf3;
+            color: #3b2a5a;
         }
 
         .btn-edit:hover {
-            background: var(--primary-dark);
+            background: #c9b6ee;
             transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(19, 168, 225, 0.2);
+            box-shadow: 0 3px 8px rgba(157, 128, 214, 0.2);
         }
 
         .btn-delete {
-            background: var(--danger);
-            color: white;
+            background: #f9c9c2;
+            color: #3b2a5a;
         }
 
         .btn-delete:hover {
-            background: #b94040;
+            background: #f4b3a7;
             transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(214, 106, 106, 0.2);
+            box-shadow: 0 3px 8px rgba(247, 183, 174, 0.2);
         }
 
         .back-button {
             display: inline-block;
             margin-bottom: 20px;
             padding: 12px 20px;
-            background: var(--gray);
-            color: white;
+            background: #e4dfee;
+            color: #3b2a5a;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 700;
@@ -142,7 +142,7 @@
         }
 
         .back-button:hover {
-            background: #5a7b99;
+            background: #d6cfe6;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
@@ -161,7 +161,7 @@
         }
 
         .stats-bar {
-            background: linear-gradient(135deg, var(--light) 0%, #e8ecf1 100%);
+            background: linear-gradient(135deg, var(--light) 0%, #fdf0ea 100%);
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
@@ -295,8 +295,8 @@
 
             {% for turno, alumnas in alumnas_por_turno.items %}
             <div style="margin-bottom: 30px;">
-                <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
-                            color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 15px;
+                <div style="background: linear-gradient(135deg, #e3d7f7 0%, #cfe7f5 100%); 
+                            color: #3b2a5a; padding: 15px 20px; border-radius: 10px; margin-bottom: 15px;
                             display: flex; align-items: center; justify-content: space-between;">
                     <h3 style="margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">
                         ⏰ {{ turno }}

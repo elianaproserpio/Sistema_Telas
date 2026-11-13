@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turnos - Sistema de Telas</title>
+    <link rel="stylesheet" href="{% static 'academia/css/main.css' %}">
+    <style>
+        .top-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .back-button,
+        .add-button {
+            display: inline-block;
+            padding: 12px 20px;
+            color: #3b2a5a;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .back-button { background: #e4dfee; }
+        .back-button:hover { background: #d6cfe6; transform: translateY(-2px); }
+
+        .add-button { background: linear-gradient(135deg, #c4ead8 0%, #b3e2cc 100%); }
+        .add-button:hover { background: linear-gradient(135deg, #b3e2cc 0%, #a2d9bf 100%); transform: translateY(-2px); }
+
+        .turnos-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .turnos-table thead {
+            background: linear-gradient(90deg, #e3d7f7 0%, #cfe7f5 100%);
+            color: #3b2a5a;
+        }
+
+        .turnos-table th {
+            text-align: left;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 16px 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .turnos-table td {
+            padding: 14px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .turnos-table tbody tr:last-child td { border-bottom: none; }
+        .turnos-table tr.inactivo td { color: var(--gray); }
+
+        .turno-nombre { font-weight: 700; color: var(--primary-dark); }
+        .inactivo .turno-nombre { color: var(--gray); text-decoration: line-through; }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-activo { background: #e6f6ee; color: var(--success); }
+        .badge-inactivo { background: #f5f5f5; color: var(--gray); }
+
+        .turno-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .turno-actions form { margin: 0; }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: inherit;
+            border: none;
+            cursor: pointer;
+            color: #3b2a5a;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-action:hover { transform: translateY(-1px); }
+        .btn-edit { background: #d9cbf3; }
+        .btn-toggle { background: #fde3c4; }
+        .btn-delete { background: #f9c9c2; }
+
+        .nota {
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        @media (max-width: 600px) {
+            .turnos-table th, .turnos-table td { padding: 10px 8px; font-size: 12px; }
+            .turno-actions { flex-direction: column; gap: 4px; }
+            .btn-action { justify-content: center; width: 100%; }
+            .back-button, .add-button { flex: 1; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="{% static 'academia/images/logo.jpg' %}" alt="Logo" onerror="this.parentElement.innerHTML='<div class=&quot;logo-placeholder&quot;>🎨</div>'">
+                </div>
+                <div>
+                    <h1>Colgarte</h1>
+                    <p class="subtitle">Gestión de Alumnas y Cuotas</p>
+                </div>
+            </div>
+        </div>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {% if message.level >= 40 %}error{% else %}success{% endif %}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="top-actions">
+            <a href="{% url 'buscar' %}" class="back-button">⬅️ Volver al Inicio</a>
+            <a href="{% url 'crear_turno' %}" class="add-button">➕ Nuevo Turno</a>
+        </div>
+
+        <h2 style="color: var(--primary-dark); font-size: 24px; margin-bottom: 20px; font-weight: 700;">⏰ Turnos</h2>
+
+        {% if turnos %}
+            <div class="table-wrap">
+                <table class="turnos-table">
+                    <thead>
+                        <tr>
+                            <th>Turno</th>
+                            <th>Alumnas</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for turno in turnos %}
+                        <tr class="{% if not turno.activo %}inactivo{% endif %}">
+                            <td><span class="turno-nombre">{{ turno.nombre }}</span></td>
+                            <td>{{ turno.cantidad_alumnas }}</td>
+                            <td>
+                                {% if turno.activo %}
+                                    <span class="badge badge-activo">✅ Activo</span>
+                                {% else %}
+                                    <span class="badge badge-inactivo">⏸️ Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="turno-actions">
+                                    <a href="{% url 'editar_turno' turno.id %}" class="btn-action btn-edit">✏️ Editar</a>
+                                    <form method="POST" action="{% url 'cambiar_estado_turno' turno.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-action btn-toggle">
+                                            {% if turno.activo %}⏸️ Desactivar{% else %}▶️ Activar{% endif %}
+                                        </button>
+                                    </form>
+                                    <a href="{% url 'eliminar_turno' turno.id %}" class="btn-action btn-delete">🗑️ Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if sin_turno %}
+                <p class="nota">Hay {{ sin_turno }} alumna{{ sin_turno|pluralize }} sin turno asignado.</p>
+            {% endif %}
+            <p class="nota">Un turno desactivado no aparece al registrar alumnas nuevas, pero las alumnas que ya lo tienen lo conservan.</p>
+        {% else %}
+            <div class="empty-message">
+                <strong>No hay turnos cargados</strong>
+                <p>Creá el primero con el botón "Nuevo Turno".</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

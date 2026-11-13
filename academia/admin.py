@@ -1,9 +1,15 @@
 from django.contrib import admin
-from .models import Alumna, Cuota
+from .models import Alumna, Cuota, Turno
+
+@admin.register(Turno)
+class TurnoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'orden', 'activo')
+    list_editable = ('orden', 'activo')
 
 @admin.register(Alumna)
 class AlumnaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'apellido', 'telefono', 'fecha_registro')
+    list_display = ('nombre', 'apellido', 'turno', 'telefono', 'fecha_registro')
+    list_filter = ('turno',)
     search_fields = ('nombre', 'apellido')
 
 @admin.register(Cuota)

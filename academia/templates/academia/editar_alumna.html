@@ -9,21 +9,21 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --primary: #13a8e1;
-            --primary-dark: #0e5c9f;
-            --accent: #9519c2;
-            --success: #52b788;
-            --warning: #d66a6a;
-            --danger: #d66a6a;
-            --light: #efe4f3;
-            --gray: #799cba;
-            --text: #0a0a0a;
-            --text-secondary: #1a1a1a;
+            --primary: #9d80d6;
+            --primary-dark: #6f52a8;
+            --accent: #f2a48f;
+            --success: #5aae8a;
+            --warning: #e9a15f;
+            --danger: #e0817c;
+            --light: #f6f0fc;
+            --gray: #8f86a8;
+            --text: #3a3150;
+            --text-secondary: #4a4063;
         }
         
         body {
             font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--light) 0%, #e8ecf1 100%);
+            background: linear-gradient(135deg, var(--light) 0%, #fdf0ea 100%);
             min-height: 100vh;
             padding: 20px;
             color: var(--text);
@@ -51,11 +51,11 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: var(--primary);
+            background: #d9cbf3;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #3b2a5a;
             font-size: 40px;
             flex-shrink: 0;
         }
@@ -123,7 +123,7 @@
         select:focus,
         textarea:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(19, 168, 225, 0.1);
+            box-shadow: 0 0 0 3px rgba(157, 128, 214, 0.1);
         }
         
         /* Tabla de Cuotas */
@@ -150,8 +150,8 @@
         }
         
         table thead {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: #f5f5f5;
+            background: linear-gradient(90deg, #e3d7f7 0%, #cfe7f5 100%);
+            color: #3b2a5a;
         }
         
         th {
@@ -182,7 +182,7 @@
         }
         
         .paid {
-            background: #eafff2;
+            background: #ecf8f2;
             color: var(--success);
         }
         
@@ -210,22 +210,22 @@
         }
         
         .btn-edit {
-            background: var(--primary);
-            color: white;
+            background: #d9cbf3;
+            color: #3b2a5a;
         }
         
         .btn-edit:hover {
-            background: var(--primary-dark);
+            background: #c9b6ee;
             transform: translateY(-1px);
         }
         
         .btn-delete {
-            background: var(--danger);
-            color: white;
+            background: #f9c9c2;
+            color: #3b2a5a;
         }
         
         .btn-delete:hover {
-            background: #c0392b;
+            background: #c9655d;
             transform: translateY(-1px);
         }
         
@@ -246,8 +246,8 @@
         button[type="submit"],
         .btn-submit {
             flex: 1;
-            background: linear-gradient(135deg, var(--success) 0%, #45a876 100%);
-            color: #f5f5f5;
+            background: linear-gradient(135deg, #c4ead8 0%, #ade0c9 100%);
+            color: #3b2a5a;
             border: none;
             padding: 15px 20px;
             border-radius: 12px;
@@ -256,19 +256,19 @@
             cursor: pointer;
             transition: all 0.3s ease;
             letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(82, 183, 136, 0.3);
+            box-shadow: 0 4px 15px rgba(127, 207, 171, 0.3);
         }
         
         button[type="submit"]:hover,
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(82, 183, 136, 0.4);
+            box-shadow: 0 6px 20px rgba(127, 207, 171, 0.4);
         }
         
         .btn-cancel {
             flex: 1;
-            background: #e8e8e8;
-            color: #333;
+            background: #ece7f5;
+            color: #3a3150;
             text-decoration: none;
             border: none;
             padding: 15px 20px;
@@ -284,7 +284,7 @@
         }
         
         .btn-cancel:hover {
-            background: #687a8e;
+            background: #d6cfe6;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.15);
         }
@@ -302,15 +302,15 @@
         }
         
         .success {
-            background: #eafff2;
+            background: #ecf8f2;
             border-color: var(--success);
-            color: #27ae60;
+            color: #4f9e7c;
         }
         
         .error {
-            background: #fff5f5;
+            background: #fff4f2;
             border-color: var(--danger);
-            color: #c0392b;
+            color: #c9655d;
         }
         
         @media (max-width: 900px) {
@@ -589,7 +589,7 @@
             <div class="cuotas-section">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
                     <h2>💰 Cuotas y Pagos</h2>
-                    <a href="{% url 'cargar_cuota' %}?alumna_id={{ alumna.id }}" style="background: var(--success); color: white; padding: 10px 15px; 
+                    <a href="{% url 'cargar_cuota' %}?alumna_id={{ alumna.id }}" style="background: #c4ead8; color: #3b2a5a; padding: 10px 15px; 
                                                               border-radius: 8px; text-decoration: none; font-weight: bold;
                                                               font-size: 14px; display: inline-block;">
                         ➕ Agregar Cuota
@@ -611,7 +611,7 @@
                             <td><strong>{{ c.get_mes_display }} {{ c.anio }}</strong></td>
                             <td>${{ c.monto }}</td>
                             <td>
-                                <span style="background: #e3f2fd; color: var(--primary); padding: 4px 10px; 
+                                <span style="background: #eaf5fc; color: var(--primary); padding: 4px 10px; 
                                              border-radius: 15px; font-size: 11px; font-weight: 700;">
                                     {{ c.get_metodo_pago_display }}
                                 </span>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Turno - Sistema de Telas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #9d80d6;
+            --primary-dark: #6f52a8;
+            --accent: #f2a48f;
+            --success: #5aae8a;
+            --warning: #e9a15f;
+            --danger: #e0817c;
+            --light: #f6f0fc;
+            --gray: #8f86a8;
+            --text: #3a3150;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light) 0%, #fdf0ea 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        
+        .alert-warning {
+            background: #fff4e0;
+            border: 2px solid var(--danger);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .alert-warning h2 {
+            color: var(--danger);
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-warning p {
+            color: #6b6283;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .alumna-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .alumna-info strong {
+            color: var(--primary);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-danger {
+            background: #f9c9c2;
+            color: #3b2a5a;
+        }
+        
+        .btn-danger:hover {
+            background: #c9655d;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(232, 135, 127, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #e4dfee;
+            color: #3b2a5a;
+        }
+        
+        .btn-secondary:hover {
+            background: #d6cfe6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        @media (max-width: 500px) {
+            .container { padding: 25px; }
+            .alert-warning h2 { font-size: 20px; }
+            .button-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="alert-warning">
+            {% if cantidad_alumnas %}
+                <h2>⚠️ No se puede eliminar</h2>
+                <div class="alumna-info">
+                    <strong>{{ turno.nombre }}</strong>
+                </div>
+                <p>Este turno tiene <strong>{{ cantidad_alumnas }}</strong> alumna{{ cantidad_alumnas|pluralize }} asignada{{ cantidad_alumnas|pluralize }}.</p>
+                <p>Para dejar de usarlo sin perder esa información, desactivalo desde la lista de turnos. Si querés eliminarlo, primero cambiá el turno de esas alumnas.</p>
+            {% else %}
+                <h2>⚠️ Confirmar Eliminación</h2>
+                <p>Estás a punto de eliminar el turno:</p>
+                <div class="alumna-info">
+                    <strong>{{ turno.nombre }}</strong>
+                </div>
+                <p style="color: var(--danger); font-weight: bold;">⚠️ Esta acción no se puede deshacer.</p>
+            {% endif %}
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="button-group">
+                {% if not cantidad_alumnas %}
+                    <button type="submit" class="btn btn-danger">🗑️ Eliminar</button>
+                {% endif %}
+                <a href="{% url 'listar_turnos' %}" class="btn btn-secondary">← Volver a Turnos</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

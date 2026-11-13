@@ -4,18 +4,18 @@
    ==================================== */
 
 :root {
-    --primary: #13a8e1;
-    --primary-dark: #0e5c9f;
-    --accent: #9519c2;
-    --success: #52b788;
-    --warning: #d66a6a;
-    --danger: #d66a6a;
-    --light: #efe4f3;
-    --gray: #799cba;
-    --gray-light: #b8ccd9;
-    --text: #0a0a0a;
-    --text-secondary: #1a1a1a;
-    --border: #ddd;
+    --primary: #9d80d6;
+    --primary-dark: #6f52a8;
+    --accent: #f2a48f;
+    --success: #5aae8a;
+    --warning: #e9a15f;
+    --danger: #e0817c;
+    --light: #f6f0fc;
+    --gray: #8f86a8;
+    --gray-light: #cdc6dd;
+    --text: #3a3150;
+    --text-secondary: #4a4063;
+    --border: #e6def2;
 }
 
 * {
@@ -30,7 +30,7 @@ html {
 
 body {
     font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, var(--light) 0%, #e8ecf1 100%);
+    background: linear-gradient(135deg, var(--light) 0%, #fdf0ea 100%);
     min-height: 100vh;
     padding: 20px;
     color: var(--text);
@@ -76,11 +76,11 @@ body {
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    background: linear-gradient(135deg, #e3d7f7 0%, #fbd9cc 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 20px rgba(19, 168, 225, 0.3);
+    box-shadow: 0 8px 20px rgba(157, 128, 214, 0.3);
     overflow: hidden;
 }
 
@@ -97,7 +97,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 50px;
-    color: #f5f5f5;
+    color: #3b2a5a;
 }
 
 h1 {
@@ -135,15 +135,15 @@ h1 {
 }
 
 .message.success {
-    background: #eafff2;
+    background: #ecf8f2;
     border-color: var(--success);
-    color: #27ae60;
+    color: #4f9e7c;
 }
 
 .message.error {
-    background: #fff5f5;
+    background: #fff4f2;
     border-color: var(--danger);
-    color: #c0392b;
+    color: #c9655d;
 }
 
 @keyframes slideDown {
@@ -184,13 +184,13 @@ input[type="text"]::placeholder {
 
 input[type="text"]:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(19, 168, 225, 0.15);
-    background: #f9fbfd;
+    box-shadow: 0 0 0 4px rgba(157, 128, 214, 0.15);
+    background: #fbf8fe;
 }
 
 .btn-search {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: #f5f5f5;
+    background: linear-gradient(135deg, #e3d7f7 0%, #cfe7f5 100%);
+    color: #3b2a5a;
     border: none;
     padding: 14px 30px;
     border-radius: 12px;
@@ -198,12 +198,12 @@ input[type="text"]:focus {
     font-weight: 700;
     font-size: 15px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(19, 168, 225, 0.2);
+    box-shadow: 0 4px 15px rgba(157, 128, 214, 0.2);
 }
 
 .btn-search:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(19, 168, 225, 0.3);
+    box-shadow: 0 6px 20px rgba(157, 128, 214, 0.3);
 }
 
 .btn-search:active {
@@ -215,7 +215,7 @@ input[type="text"]:focus {
    ==================================== */
 
 .result-section {
-    background: linear-gradient(135deg, #f9fbfd 0%, #efe4f3 100%);
+    background: linear-gradient(135deg, #fbf8fe 0%, #f6f0fc 100%);
     padding: 25px;
     border-radius: 15px;
     border-left: 5px solid var(--primary);
@@ -268,8 +268,8 @@ input[type="text"]:focus {
 .action-buttons a {
     flex: 1;
     padding: 10px;
-    background: var(--primary);
-    color: #f5f5f5;
+    background: #d9cbf3;
+    color: #3b2a5a;
     border-radius: 8px;
     text-decoration: none;
     text-align: center;
@@ -280,9 +280,9 @@ input[type="text"]:focus {
 }
 
 .action-buttons a:hover {
-    background: var(--primary-dark);
+    background: #c9b6ee;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(19, 168, 225, 0.2);
+    box-shadow: 0 4px 12px rgba(157, 128, 214, 0.2);
 }
 
 /* ====================================
@@ -300,13 +300,13 @@ table {
 }
 
 table thead {
-    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: #f5f5f5;
+    background: linear-gradient(90deg, #e3d7f7 0%, #cfe7f5 100%);
+    color: #3b2a5a;
 }
 
 th {
     text-align: left;
-    color: #f5f5f5;
+    color: #3b2a5a;
     font-size: 13px;
     font-weight: 700;
     padding: 16px 14px;
@@ -323,7 +323,7 @@ td {
 }
 
 tr:hover {
-    background: #f9fbfd;
+    background: #fbf8fe;
 }
 
 /* ====================================
@@ -341,15 +341,15 @@ tr:hover {
 }
 
 .paid {
-    background: linear-gradient(135deg, #eafff2 0%, #d4ffea 100%);
-    color: #27ae60;
-    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
+    background: linear-gradient(135deg, #ecf8f2 0%, #dcf3e8 100%);
+    color: #4f9e7c;
+    box-shadow: 0 2px 8px rgba(127, 207, 171, 0.2);
 }
 
 .pending {
-    background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
-    color: #c0392b;
-    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
+    background: linear-gradient(135deg, #fff4f2 0%, #fde6e2 100%);
+    color: #c9655d;
+    box-shadow: 0 2px 8px rgba(232, 135, 127, 0.2);
 }
 
 /* ====================================
@@ -362,12 +362,12 @@ tr:hover {
     padding: 40px 20px;
     font-size: 15px;
     font-weight: 500;
-    background: #f9fbfd;
+    background: #fbf8fe;
     border-radius: 12px;
 }
 
 .not-found {
-    background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+    background: linear-gradient(135deg, #fff4f2 0%, #fde6e2 100%);
     border-left: 5px solid var(--danger);
     padding: 20px;
     border-radius: 10px;
@@ -394,7 +394,7 @@ tr:hover {
     padding: 16px 20px;
     text-align: center;
     border-radius: 12px;
-    color: #f5f5f5;
+    color: #3b2a5a;
     font-weight: 700;
     font-size: 14px;
     transition: all 0.3s ease;
@@ -418,39 +418,48 @@ tr:hover {
 }
 
 .bg-add {
-    background: linear-gradient(135deg, #52b788 0%, #45a876 100%);
+    background: linear-gradient(135deg, #c4ead8 0%, #b3e2cc 100%);
 }
 
 .bg-add:hover {
-    background: linear-gradient(135deg, #45a876 0%, #3a8f63 100%);
+    background: linear-gradient(135deg, #b3e2cc 0%, #a2d9bf 100%);
 }
 
 .bg-pay {
-    background: linear-gradient(135deg, #d66a6a 0%, #c95555 100%);
+    background: linear-gradient(135deg, #fbd2ca 0%, #f8c3b8 100%);
 }
 
 .bg-pay:hover {
-    background: linear-gradient(135deg, #c95555 0%, #b94040 100%);
+    background: linear-gradient(135deg, #f8c3b8 0%, #f4b3a7 100%);
 }
 
 .bg-list {
-    background: linear-gradient(135deg, #13a8e1 0%, #0e8fbf 100%);
+    background: linear-gradient(135deg, #d4ebf7 0%, #bfe0f3 100%);
 }
 
 .bg-list:hover {
-    background: linear-gradient(135deg, #0e8fbf 0%, #0a6d9b 100%);
+    background: linear-gradient(135deg, #bfe0f3 0%, #a9d3ec 100%);
 }
 
 .bg-payments {
-    background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+    background: linear-gradient(135deg, #fde3c4 0%, #fbd5ab 100%);
 }
 
 .bg-payments:hover {
-    background: linear-gradient(135deg, #d68910 0%, #b8760d 100%);
+    background: linear-gradient(135deg, #fbd5ab 0%, #f8c792 100%);
+}
+
+.bg-turnos {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #e3d7f7 0%, #d6c6f3 100%);
+}
+
+.bg-turnos:hover {
+    background: linear-gradient(135deg, #d6c6f3 0%, #c9b6ee 100%);
 }
 
 .bg-admin {
-    background: linear-gradient(135deg, var(--gray) 0%, #687a8e 100%);
+    background: linear-gradient(135deg, #e4dfee 0%, #d6cfe6 100%);
 }
 
 /* ====================================

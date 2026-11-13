@@ -18,8 +18,8 @@
         }
 
         .pagos-table thead {
-            background: linear-gradient(90deg, var(--warning) 0%, #c05252 100%);
-            color: #f5f5f5;
+            background: linear-gradient(90deg, #fde0c2 0%, #f9cbb8 100%);
+            color: #3b2a5a;
         }
 
         .pagos-table th {
@@ -27,7 +27,7 @@
             font-size: 13px;
             font-weight: 700;
             padding: 16px 14px;
-            border-bottom: 2px solid #c05252;
+            border-bottom: 2px solid #d9786f;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -53,7 +53,7 @@
         }
 
         .estado-pagado {
-            background: #e8f5e9;
+            background: #e6f6ee;
             color: var(--success);
             padding: 6px 12px;
             border-radius: 20px;
@@ -64,7 +64,7 @@
 
         .estado-pendiente {
             background: #fff3e0;
-            color: #e6821c;
+            color: #d98a3d;
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
@@ -103,26 +103,26 @@
         }
 
         .btn-edit {
-            background: var(--primary);
-            color: white;
+            background: #d9cbf3;
+            color: #3b2a5a;
         }
 
         .btn-edit:hover {
-            background: var(--primary-dark);
+            background: #c9b6ee;
             transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(19, 168, 225, 0.2);
+            box-shadow: 0 3px 8px rgba(157, 128, 214, 0.2);
         }
 
         .btn-edit[style*="success"]:hover {
-            background: #45a876 !important;
+            background: #b3e2cc !important;
         }
 
         .back-button {
             display: inline-block;
             margin-bottom: 20px;
             padding: 12px 20px;
-            background: var(--gray);
-            color: white;
+            background: #e4dfee;
+            color: #3b2a5a;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 700;
@@ -130,7 +130,7 @@
         }
 
         .back-button:hover {
-            background: #5a7b99;
+            background: #d6cfe6;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
@@ -149,7 +149,7 @@
         }
 
         .stats-bar {
-            background: linear-gradient(135deg, var(--light) 0%, #e8ecf1 100%);
+            background: linear-gradient(135deg, var(--light) 0%, #fdf0ea 100%);
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
@@ -291,7 +291,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.3s ease;" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
+                <button type="submit" style="background: #d9cbf3; color: #3b2a5a; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.3s ease;" onmouseover="this.style.background='#c9b6ee'" onmouseout="this.style.background='#d9cbf3'">
                     🔍 Ver Pagos
                 </button>
             </form>
@@ -312,8 +312,8 @@
 
             {% for turno, alumnas_info in pagos_por_turno.items %}
             <div style="margin-bottom: 30px;">
-                <div style="background: linear-gradient(135deg, var(--warning) 0%, #c05252 100%); 
-                            color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 15px;
+                <div style="background: linear-gradient(135deg, #fde0c2 0%, #f9cbb8 100%); 
+                            color: #3b2a5a; padding: 15px 20px; border-radius: 10px; margin-bottom: 15px;
                             display: flex; align-items: center; justify-content: space-between;">
                     <h3 style="margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">
                         ⏰ {{ turno }}
@@ -360,7 +360,7 @@
             </td>
             <td>
                 {% if item.cuota_mes_seleccionado %}
-                    <span style="background: #e3f2fd; color: var(--primary); padding: 6px 12px; 
+                    <span style="background: #eaf5fc; color: var(--primary); padding: 6px 12px; 
                                  border-radius: 15px; font-size: 11px; font-weight: 700;">
                         {{ item.cuota_mes_seleccionado.get_metodo_pago_display }}
                     </span>
@@ -384,7 +384,7 @@
             <td>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <a href="{% url 'editar_alumna' item.alumna.id %}" class="btn-action btn-edit">📋 Historial</a>
-                    <a href="{% url 'cargar_cuota' %}?alumna_id={{ item.alumna.id }}" class="btn-action btn-edit" style="background: var(--success);">➕ Cuota</a>
+                    <a href="{% url 'cargar_cuota' %}?alumna_id={{ item.alumna.id }}" class="btn-action btn-edit" style="background: #c4ead8;">➕ Cuota</a>
                 </div>
             </td>
         </tr>

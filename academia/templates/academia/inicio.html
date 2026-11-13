@@ -45,7 +45,7 @@
                     <div class="alumna-name">{{ alumna.nombre }} {{ alumna.apellido }}</div>
                     <div class="alumna-details">
                         <div><strong>📱 Teléfono:</strong> {{ alumna.telefono|default:"No registrado" }}</div>
-                        <div><strong>⏰ Turno:</strong> {{ alumna.get_turno_display|default:"No especificado" }}</div>
+                        <div><strong>⏰ Turno:</strong> {{ alumna.turno.nombre|default:"No especificado" }}</div>
                     </div>
                     <div class="action-buttons">
                         <a href="{% url 'editar_alumna' alumna.id %}">✏️ Editar</a>
@@ -109,6 +109,7 @@
             {% endif %}
             <a href="{% url 'listar_alumnas' %}" class="nav-btn bg-list">👥 Ver Alumnas</a>
             <a href="{% url 'gestionar_pagos' %}" class="nav-btn bg-payments">💳 Gestionar Pagos</a>
+            <a href="{% url 'listar_turnos' %}" class="nav-btn bg-turnos">⏰ Turnos</a>
         </div>
     </div>
 </body>
