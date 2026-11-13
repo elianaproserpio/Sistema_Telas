@@ -365,5 +365,111 @@
             </div>
         </form>
     </div>
+
+    {% if form.alumna %}
+    <style>
+        .buscador-alumna { margin-bottom: 8px; }
+        .buscador-info { font-size: 13px; color: var(--gray); margin: 6px 2px 0; font-weight: 500; }
+        select.lista-abierta { padding: 6px; }
+        select.lista-abierta option { padding: 8px 10px; border-radius: 6px; }
+    </style>
+    <script>
+    // Buscador para el selector de alumnas (Registrar Pago)
+    (function () {
+        var select = document.getElementById('id_alumna');
+        if (!select) return;
+
+        var normalizar = function (texto) {
+            return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+        };
+
+        var buscador = document.createElement('input');
+        buscador.type = 'text';
+        buscador.className = 'form-input buscador-alumna';
+        buscador.placeholder = '🔍 Escribí para buscar alumna...';
+        buscador.autocomplete = 'off';
+
+        var info = document.createElement('p');
+        info.className = 'buscador-info';
+
+        select.parentNode.insertBefore(buscador, select);
+        select.parentNode.insertBefore(info, select.nextSibling);
+
+        var opciones = Array.prototype.slice.call(select.options).filter(function (o) { return o.value; });
+        var opcionVacia = Array.prototype.slice.call(select.options).filter(function (o) { return !o.value; })[0];
+
+        function cerrarLista() {
+            select.size = 0;
+            select.classList.remove('lista-abierta');
+        }
+
+        function filtrar() {
+            var palabras = normalizar(buscador.value).split(/\s+/).filter(Boolean);
+            var visibles = [];
+            opciones.forEach(function (o) {
+                var texto = normalizar(o.text);
+                var coincide = palabras.every(function (p) { return texto.indexOf(p) !== -1; });
+                o.hidden = !coincide;
+                o.disabled = !coincide;
+                if (coincide) visibles.push(o);
+            });
+            if (opcionVacia) opcionVacia.hidden = palabras.length > 0;
+
+            if (!palabras.length) {
+                info.textContent = '';
+                cerrarLista();
+                return;
+            }
+
+            if (!visibles.length) {
+                info.textContent = 'No se encontró ninguna alumna con "' + buscador.value + '".';
+                select.value = '';
+                cerrarLista();
+                return;
+            }
+
+            info.textContent = visibles.length === 1
+                ? '✅ 1 alumna encontrada'
+                : visibles.length + ' alumnas encontradas — elegí una de la lista';
+            // Si la seleccionada ya no coincide, se elige la primera que coincide
+            if (!select.value || select.selectedOptions[0].hidden) {
+                select.value = visibles[0].value;
+            }
+            if (visibles.length > 1) {
+                select.size = Math.min(Math.max(visibles.length, 2), 6);
+                select.classList.add('lista-abierta');
+            } else {
+                cerrarLista();
+            }
+        }
+
+        buscador.addEventListener('input', filtrar);
+        buscador.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();  // no enviar el formulario al apretar Enter en el buscador
+                cerrarLista();
+            } else if (e.key === 'ArrowDown' && select.size > 1) {
+                e.preventDefault();
+                select.focus();
+            }
+        });
+        select.addEventListener('change', function () {
+            var elegida = select.selectedOptions[0];
+            if (elegida && elegida.value) {
+                info.textContent = '✅ Seleccionada: ' + elegida.text;
+            }
+        });
+        select.addEventListener('click', function () {
+            if (select.size > 1 && select.value) cerrarLista();
+        });
+        select.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && select.size > 1) {
+                e.preventDefault();
+                cerrarLista();
+            }
+        });
+    })();
+    </script>
+    {% endif %}
 </body>
 </html>

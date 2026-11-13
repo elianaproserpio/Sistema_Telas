@@ -1,5 +1,9 @@
+import unicodedata
+from datetime import date
+from decimal import Decimal, InvalidOperation
+
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Alumna, Cuota, Turno
+from .models import Alumna, Cuota, Turno, MESES
 from .forms import AlumnaForm, CuotaForm, CuotaEditForm, TurnoForm
 from django.contrib import messages
 from django.db import IntegrityError
@@ -8,47 +12,49 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 
+def normalizar(texto):
+    """Pasa a minúsculas y quita tildes, para buscar 'rodriguez' y encontrar 'Rodríguez'."""
+    texto = unicodedata.normalize('NFD', texto or '')
+    return ''.join(c for c in texto if unicodedata.category(c) != 'Mn').lower()
+
+
+def buscar_alumnas(query):
+    """Devuelve todas las alumnas cuyo nombre + apellido contienen todas las palabras buscadas."""
+    palabras = normalizar(query).split()
+    if not palabras:
+        return []
+    coincidencias = []
+    for alumna in Alumna.objects.select_related('turno').order_by('nombre', 'apellido'):
+        texto = normalizar(f'{alumna.nombre} {alumna.apellido}')
+        if all(p in texto for p in palabras):
+            coincidencias.append(alumna)
+    return coincidencias
+
+
 def buscar_alumna(request):
-    """Vista principal - busca y muestra alumnas con sus cuotas"""
+    """Vista principal - busca alumnas y muestra una con sus cuotas"""
     query = request.GET.get('q', '').strip()
+    alumna_id = request.GET.get('id', '')
     resultado = None
+    resultados = []
     cuotas = None
 
-    if query:
-        # Dividir la búsqueda para permitir "nombre apellido"
-        palabras = query.split()
-        
-        # Buscar por nombre completo o parcial
-        if len(palabras) >= 2:
-            # Si hay 2 o más palabras, buscar por nombre Y apellido
-            resultado = Alumna.objects.filter(
-                nombre__icontains=palabras[0],
-                apellido__icontains=palabras[1]
-            ).first()
-            
-            # Si no encuentra con ese orden, intentar invertido
-            if not resultado:
-                resultado = Alumna.objects.filter(
-                    nombre__icontains=palabras[1],
-                    apellido__icontains=palabras[0]
-                ).first()
-        else:
-            # Si es una sola palabra, buscar en nombre o apellido
-            resultado = Alumna.objects.filter(
-                nombre__icontains=query
-            ).first()
-            
-            if not resultado:
-                resultado = Alumna.objects.filter(
-                    apellido__icontains=query
-                ).first()
-        
-        if resultado:
-            # Traemos todas sus cuotas ordenadas por mes descendente
-            cuotas = Cuota.objects.filter(alumna=resultado).order_by('-anio', '-mes')
+    if alumna_id.isdigit():
+        # Se eligió una alumna de la lista de resultados
+        resultado = Alumna.objects.filter(id=alumna_id).first()
+    elif query:
+        resultados = buscar_alumnas(query)
+        if len(resultados) == 1:
+            resultado = resultados[0]
+            resultados = []
+
+    if resultado:
+        # Traemos todas sus cuotas ordenadas por mes descendente
+        cuotas = Cuota.objects.filter(alumna=resultado).order_by('-anio', '-mes')
 
     return render(request, 'academia/inicio.html', {
         'alumna': resultado,
+        'resultados': resultados,
         'cuotas': cuotas,
         'query': query
     })
@@ -163,16 +169,29 @@ def cargar_cuota(request):
             except IntegrityError:
                 form.add_error(None, '❌ Esta alumna ya tiene registrada una cuota para ese mes y año. Edita la existente para cambiar el estado a Pagado.')
     else:
-        initial_data = {}
+        # Por defecto: mes y año actuales (o los que vienen desde Gestionar Pagos)
+        hoy = date.today()
+        mes = entero(request.GET.get('mes'), hoy.month, 1, 12)
+        anio = entero(request.GET.get('anio'), hoy.year, 2000, 2100)
+        initial_data = {'mes': mes, 'anio': anio}
         if alumna_preseleccionada:
             initial_data['alumna'] = alumna_preseleccionada
         form = CuotaForm(initial=initial_data)
-    
+
     return render(request, 'academia/formulario.html', {
         'form': form,
         'titulo': '💰 Registrar Pago',
-        'alumna_preseleccionada': alumna_preseleccionada
+        'alumna_preseleccionada': alumna_preseleccionada,
     })
+
+
+def entero(valor, por_defecto, minimo, maximo):
+    """Convierte un parámetro de la URL a número, con un valor por defecto si viene mal."""
+    try:
+        numero = int(valor)
+    except (TypeError, ValueError):
+        return por_defecto
+    return numero if minimo <= numero <= maximo else por_defecto
 
 
 def listar_alumnas(request):
@@ -197,83 +216,135 @@ def listar_alumnas(request):
 
 def gestionar_pagos(request):
     """Vista para gestionar pagos de alumnas por turno"""
-    from datetime import datetime
-    
-    mes_actual = datetime.now().month
-    anio_actual = datetime.now().year
+    hoy = date.today()
+    mes_actual = hoy.month
+    anio_actual = hoy.year
     
     # Obtener mes/año seleccionados (por defecto, mes actual)
-    mes_seleccionado = int(request.GET.get('mes', mes_actual))
-    anio_seleccionado = int(request.GET.get('anio', anio_actual))
-    
+    mes_seleccionado = entero(request.GET.get('mes'), mes_actual, 1, 12)
+    anio_seleccionado = entero(request.GET.get('anio'), anio_actual, 2000, 2100)
+
+    # Todas las cuotas del mes en una sola consulta
+    cuotas_del_mes = {
+        c.alumna_id: c
+        for c in Cuota.objects.filter(mes=mes_seleccionado, anio=anio_seleccionado)
+    }
+
     pagos_por_turno = {}
     estadisticas = {
         'total_pagado_mes': 0,
+        'pagadas': 0,
+        'pendientes': 0,
         'total_alumnas': Alumna.objects.count()
     }
-    
+
+    def armar_lista(alumnas):
+        lista = []
+        for alumna in alumnas:
+            cuota = cuotas_del_mes.get(alumna.id)
+            lista.append({'alumna': alumna, 'cuota_mes_seleccionado': cuota})
+            if cuota and cuota.pagado:
+                estadisticas['total_pagado_mes'] += cuota.monto
+                estadisticas['pagadas'] += 1
+            else:
+                estadisticas['pendientes'] += 1
+        return lista
+
+    alumnas_por_turno = {}
+    for alumna in Alumna.objects.order_by('nombre', 'apellido'):
+        alumnas_por_turno.setdefault(alumna.turno_id, []).append(alumna)
+
     for turno in Turno.objects.all():
-        alumnas = Alumna.objects.filter(turno=turno).order_by('nombre', 'apellido')
-        if alumnas.exists():
-            alumnas_con_cuota = []
-            for alumna in alumnas:
-                # Obtener cuota del mes seleccionado
-                try:
-                    cuota_mes_seleccionado = Cuota.objects.get(alumna=alumna, mes=mes_seleccionado, anio=anio_seleccionado)
-                except Cuota.DoesNotExist:
-                    cuota_mes_seleccionado = None
-                
-                alumnas_con_cuota.append({
-                    'alumna': alumna,
-                    'cuota_mes_seleccionado': cuota_mes_seleccionado,
-                })
-                
-                # Estadísticas del mes seleccionado (solo pagados)
-                if cuota_mes_seleccionado and cuota_mes_seleccionado.pagado:
-                    estadisticas['total_pagado_mes'] += cuota_mes_seleccionado.monto
-            
-            pagos_por_turno[turno.nombre] = alumnas_con_cuota
+        if turno.id in alumnas_por_turno:
+            pagos_por_turno[turno.nombre] = armar_lista(alumnas_por_turno[turno.id])
 
     # También incluir alumnas sin turno
-    sin_turno = Alumna.objects.filter(turno__isnull=True).order_by('nombre', 'apellido')
-    if sin_turno.exists():
-        alumnas_con_cuota = []
-        for alumna in sin_turno:
-            try:
-                cuota_mes_seleccionado = Cuota.objects.get(alumna=alumna, mes=mes_seleccionado, anio=anio_seleccionado)
-            except Cuota.DoesNotExist:
-                cuota_mes_seleccionado = None
-            
-            alumnas_con_cuota.append({
-                'alumna': alumna,
-                'cuota_mes_seleccionado': cuota_mes_seleccionado,
-            })
-            
-            if cuota_mes_seleccionado and cuota_mes_seleccionado.pagado:
-                estadisticas['total_pagado_mes'] += cuota_mes_seleccionado.monto
-        
-        pagos_por_turno['Sin turno especificado'] = alumnas_con_cuota
-    
-    # Generar lista de meses para el selector
-    meses = [
-        (1, 'Enero'), (2, 'Febrero'), (3, 'Marzo'), (4, 'Abril'),
-        (5, 'Mayo'), (6, 'Junio'), (7, 'Julio'), (8, 'Agosto'),
-        (9, 'Septiembre'), (10, 'Octubre'), (11, 'Noviembre'), (12, 'Diciembre'),
-    ]
-    
+    if None in alumnas_por_turno:
+        pagos_por_turno['Sin turno especificado'] = armar_lista(alumnas_por_turno[None])
+
     # Generar lista de años (últimos 3 años + próximo año)
     anios = list(range(anio_actual - 2, anio_actual + 2))
-    
+    if anio_seleccionado not in anios:
+        anios.append(anio_seleccionado)
+        anios.sort()
+
     return render(request, 'academia/gestionar_pagos.html', {
         'pagos_por_turno': pagos_por_turno,
         'estadisticas': estadisticas,
         'mes_seleccionado': mes_seleccionado,
+        'mes_seleccionado_nombre': dict(MESES)[mes_seleccionado],
         'anio_seleccionado': anio_seleccionado,
-        'meses': meses,
+        'meses': MESES,
         'anios': anios,
         'mes_actual': mes_actual,
         'anio_actual': anio_actual
     })
+
+
+@require_POST
+def marcar_pagado(request):
+    """Marca como pagada (o deshace) la cuota de una alumna para un mes, desde Gestionar Pagos"""
+    alumna = get_object_or_404(Alumna, id=request.POST.get('alumna_id'))
+    hoy = date.today()
+    mes = entero(request.POST.get('mes'), hoy.month, 1, 12)
+    anio = entero(request.POST.get('anio'), hoy.year, 2000, 2100)
+    accion = request.POST.get('accion', 'pagar')
+    volver = f"{reverse('gestionar_pagos')}?mes={mes}&anio={anio}#alumna-{alumna.id}"
+    nombre_mes = dict(MESES)[mes]
+
+    cuota = Cuota.objects.filter(alumna=alumna, mes=mes, anio=anio).first()
+
+    if accion == 'deshacer':
+        if cuota and cuota.pagado:
+            cuota.pagado = False
+            cuota.fecha_pago = None
+            cuota.save(update_fields=['pagado', 'fecha_pago'])
+            messages.success(request, f'↩️ {alumna.nombre} {alumna.apellido}: {nombre_mes} volvió a pendiente.')
+        return redirect(volver)
+
+    metodo = request.POST.get('metodo')
+    if metodo not in dict(Cuota.METODOS_PAGO):
+        metodo = 'efectivo'
+
+    # El monto lo escriben en la fila (cada alumna puede pagar distinto).
+    # Si la cuota ya existe con monto y no escriben nada, se mantiene el que tenía.
+    monto = None
+    texto_monto = (request.POST.get('monto') or '').strip().replace('$', '').replace(' ', '')
+    if texto_monto:
+        # Acepta "25000", "25.000", "25000,50" y "25.000,50"
+        if ',' in texto_monto:
+            texto_monto = texto_monto.replace('.', '').replace(',', '.')
+        elif texto_monto.count('.') == 1 and len(texto_monto.split('.')[1]) == 3:
+            texto_monto = texto_monto.replace('.', '')
+        try:
+            monto = Decimal(texto_monto)
+        except InvalidOperation:
+            monto = None
+        if monto is None or monto <= 0 or monto >= Decimal('100000000'):
+            messages.error(request, f'❌ El monto "{request.POST.get("monto")}" no es válido.')
+            return redirect(volver)
+
+    if monto is None and not (cuota and cuota.monto):
+        messages.error(
+            request,
+            f'❌ Escribí el monto que pagó {alumna.nombre} antes de tocar Efectivo o Transferencia.'
+        )
+        return redirect(volver)
+
+    if cuota is None:
+        cuota = Cuota(alumna=alumna, mes=mes, anio=anio)
+    if monto is not None:
+        cuota.monto = monto
+    cuota.pagado = True
+    cuota.metodo_pago = metodo
+    cuota.fecha_pago = cuota.fecha_pago or hoy
+    cuota.save()
+    messages.success(
+        request,
+        f'✅ {alumna.nombre} {alumna.apellido}: {nombre_mes} pagado (${cuota.monto}, {cuota.get_metodo_pago_display()}).'
+    )
+    return redirect(volver)
+
 
 # ---------------------------------------------------------------------------
 # Gestión de turnos

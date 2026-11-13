@@ -117,6 +117,68 @@
             background: #b3e2cc !important;
         }
 
+        .acciones-pago {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .acciones-pago form { margin: 0; }
+
+        .btn-pagar {
+            background: #c4ead8;
+            color: #2f6e53;
+            font-family: inherit;
+        }
+
+        .btn-pagar:hover {
+            background: #a2d9bf;
+            transform: translateY(-1px);
+        }
+
+        .btn-deshacer {
+            background: #f1edf7;
+            color: #6b6283;
+            font-family: inherit;
+        }
+
+        .btn-deshacer:hover {
+            background: #e4dfee;
+        }
+
+        .pago-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gray);
+        }
+
+        .form-pago {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .input-monto {
+            width: 95px;
+            padding: 6px 8px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text);
+        }
+
+        .input-monto:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        tr:target td {
+            background: #fdf6e8;
+        }
+
         .back-button {
             display: inline-block;
             margin-bottom: 20px;
@@ -262,6 +324,14 @@
             </div>
         </div>
 
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {% if message.level >= 40 %}error{% else %}success{% endif %}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <a href="{% url 'buscar' %}" class="back-button">⬅️ Volver al Inicio</a>
 
         <h2 style="color: var(--warning); font-size: 24px; margin-bottom: 20px; font-weight: 700;">💰 Gestión de Pagos por Turno</h2>
@@ -305,8 +375,8 @@
                     <span class="stat-label">Total Pagado</span>
                 </div>
                 <div class="stat-card total">
-                    <span class="stat-number">{{ estadisticas.total_alumnas }}</span>
-                    <span class="stat-label">Total de Alumnas</span>
+                    <span class="stat-number">{{ estadisticas.pagadas }} / {{ estadisticas.total_alumnas }}</span>
+                    <span class="stat-label">Pagaron · {{ estadisticas.pendientes }} pendiente{{ estadisticas.pendientes|pluralize }}</span>
                 </div>
             </div>
 
@@ -342,7 +412,7 @@
                     <tbody>
     {% for item in alumnas_info %}
         {# Quitamos el filtro de "pagado" para que aparezcan todas y el estado funcione #}
-        <tr>
+        <tr id="alumna-{{ item.alumna.id }}">
             <td>
                 <div class="alumna-nombre">{{ item.alumna.nombre }} {{ item.alumna.apellido }}</div>
             </td>
@@ -350,13 +420,11 @@
                 {{ item.alumna.telefono|default:"-" }}
             </td>
             <td>
-                <strong style="color: var(--primary); font-size: 15px;">
-                    {% if item.cuota_mes_seleccionado %}
-                        ${{ item.cuota_mes_seleccionado.monto }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </strong>
+                {% if item.cuota_mes_seleccionado %}
+                    <strong style="color: var(--primary); font-size: 15px;">${{ item.cuota_mes_seleccionado.monto }}</strong>
+                {% else %}
+                    <strong style="color: var(--primary); font-size: 15px;">-</strong>
+                {% endif %}
             </td>
             <td>
                 {% if item.cuota_mes_seleccionado %}
@@ -382,9 +450,33 @@
             </td>
 
             <td>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <div class="acciones-pago">
+                    {% if item.cuota_mes_seleccionado.pagado %}
+                        <form method="POST" action="{% url 'marcar_pagado' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="alumna_id" value="{{ item.alumna.id }}">
+                            <input type="hidden" name="mes" value="{{ mes_seleccionado }}">
+                            <input type="hidden" name="anio" value="{{ anio_seleccionado }}">
+                            <input type="hidden" name="accion" value="deshacer">
+                            <button type="submit" class="btn-action btn-deshacer" title="Volver a pendiente">↩️ Deshacer</button>
+                        </form>
+                    {% else %}
+                        <form method="POST" action="{% url 'marcar_pagado' %}" class="form-pago">
+                            {% csrf_token %}
+                            <input type="hidden" name="alumna_id" value="{{ item.alumna.id }}">
+                            <input type="hidden" name="mes" value="{{ mes_seleccionado }}">
+                            <input type="hidden" name="anio" value="{{ anio_seleccionado }}">
+                            {% if item.cuota_mes_seleccionado.monto %}
+                                <span class="pago-label">Pagó ${{ item.cuota_mes_seleccionado.monto }}:</span>
+                            {% else %}
+                                <input type="text" name="monto" class="input-monto" inputmode="decimal"
+                                       placeholder="$ Monto" aria-label="Monto que pagó {{ item.alumna.nombre }}" required>
+                            {% endif %}
+                            <button type="submit" name="metodo" value="efectivo" class="btn-action btn-pagar" title="Marcar como pagado en efectivo">💵 Efectivo</button>
+                            <button type="submit" name="metodo" value="transferencia" class="btn-action btn-pagar" title="Marcar como pagado por transferencia">🏦 Transf.</button>
+                        </form>
+                    {% endif %}
                     <a href="{% url 'editar_alumna' item.alumna.id %}" class="btn-action btn-edit">📋 Historial</a>
-                    <a href="{% url 'cargar_cuota' %}?alumna_id={{ item.alumna.id }}" class="btn-action btn-edit" style="background: #c4ead8;">➕ Cuota</a>
                 </div>
             </td>
         </tr>

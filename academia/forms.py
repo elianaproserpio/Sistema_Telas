@@ -59,6 +59,12 @@ class CuotaForm(forms.ModelForm):
             'fecha_pago': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Alumnas en orden alfabético para encontrarlas más fácil
+        self.fields['alumna'].queryset = Alumna.objects.order_by('nombre', 'apellido')
+        self.fields['alumna'].empty_label = 'Elegí una alumna'
+
 # Formulario para editar cuotas directamente
 class CuotaEditForm(forms.ModelForm):
     class Meta:

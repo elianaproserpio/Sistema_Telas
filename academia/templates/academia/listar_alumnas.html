@@ -293,8 +293,13 @@
                 </div>
             </div>
 
+            <div class="buscador-listado">
+                <input type="text" id="buscar-listado" placeholder="🔍 Buscar por nombre, apellido o teléfono..." autocomplete="off">
+                <p id="buscar-info" class="buscar-info"></p>
+            </div>
+
             {% for turno, alumnas in alumnas_por_turno.items %}
-            <div style="margin-bottom: 30px;">
+            <div class="grupo-turno" style="margin-bottom: 30px;">
                 <div style="background: linear-gradient(135deg, #e3d7f7 0%, #cfe7f5 100%); 
                             color: #3b2a5a; padding: 15px 20px; border-radius: 10px; margin-bottom: 15px;
                             display: flex; align-items: center; justify-content: space-between;">
@@ -303,7 +308,7 @@
                     </h3>
                     <span style="background: rgba(255,255,255,0.3); padding: 4px 12px; border-radius: 20px;
                                  font-size: 12px; font-weight: 700;">
-                        {{ alumnas|length }} alumnas
+                        <span class="contador-turno" data-total="{{ alumnas|length }}">{{ alumnas|length }}</span> alumnas
                     </span>
                 </div>
 
@@ -319,7 +324,7 @@
                     </thead>
                     <tbody>
                         {% for alumna in alumnas %}
-                        <tr>
+                        <tr class="fila-alumna" data-buscar="{{ alumna.nombre }} {{ alumna.apellido }} {{ alumna.telefono }}">
                             <td>
                                 <div class="alumna-nombre">{{ alumna.nombre }} {{ alumna.apellido }}</div>
                             </td>
@@ -359,3 +364,60 @@
                 <p>Comienza creando una nueva alumna desde el botón "Nueva Alumna"</p>
             </div>
         {% endif %}
+    </div>
+
+    <style>
+        .buscador-listado { margin: 0 0 20px; }
+        .buscador-listado input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--text);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .buscador-listado input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(157, 128, 214, 0.15);
+        }
+        .buscar-info { font-size: 13px; color: var(--gray); margin: 6px 2px 0; font-weight: 500; }
+    </style>
+    <script>
+    // Buscador del listado: filtra las filas y oculta los turnos sin coincidencias
+    (function () {
+        var input = document.getElementById('buscar-listado');
+        if (!input) return;
+        var info = document.getElementById('buscar-info');
+        var grupos = document.querySelectorAll('.grupo-turno');
+
+        function normalizar(t) {
+            return (t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        }
+
+        input.addEventListener('input', function () {
+            var palabras = normalizar(input.value).split(/\s+/).filter(Boolean);
+            var total = 0;
+            grupos.forEach(function (grupo) {
+                var visibles = 0;
+                grupo.querySelectorAll('.fila-alumna').forEach(function (fila) {
+                    var texto = normalizar(fila.getAttribute('data-buscar'));
+                    var ok = palabras.every(function (p) { return texto.indexOf(p) !== -1; });
+                    fila.hidden = !ok;
+                    if (ok) visibles++;
+                });
+                grupo.hidden = visibles === 0;
+                var contador = grupo.querySelector('.contador-turno');
+                if (contador) contador.textContent = palabras.length ? visibles : contador.getAttribute('data-total');
+                total += visibles;
+            });
+            if (!palabras.length) info.textContent = '';
+            else if (!total) info.textContent = 'No se encontró ninguna alumna con "' + input.value + '".';
+            else info.textContent = total === 1 ? '1 alumna encontrada' : total + ' alumnas encontradas';
+        });
+    })();
+    </script>
+</body>
+</html>

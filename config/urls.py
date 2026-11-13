@@ -15,6 +15,7 @@ from academia.views import (
     editar_turno,
     cambiar_estado_turno,
     eliminar_turno,
+    marcar_pagado,
 )
 
 urlpatterns = [
@@ -33,4 +34,5 @@ urlpatterns = [
     path('turnos/<int:id>/editar/', editar_turno, name='editar_turno'),
     path('turnos/<int:id>/estado/', cambiar_estado_turno, name='cambiar_estado_turno'),
     path('turnos/<int:id>/eliminar/', eliminar_turno, name='eliminar_turno'),
+    path('pagos/marcar/', marcar_pagado, name='marcar_pagado'),
 ]

@@ -1,5 +1,19 @@
+﻿from datetime import date
+
 from django.db import models
 from django.core.exceptions import ValidationError
+
+
+def anio_actual():
+    return date.today().year
+
+
+MESES = [
+    (1, 'Enero'), (2, 'Febrero'), (3, 'Marzo'), (4, 'Abril'),
+    (5, 'Mayo'), (6, 'Junio'), (7, 'Julio'), (8, 'Agosto'),
+    (9, 'Septiembre'), (10, 'Octubre'), (11, 'Noviembre'), (12, 'Diciembre'),
+]
+
 
 class Turno(models.Model):
     """Turno de clase. Se crean, editan y desactivan desde la pantalla de Turnos."""
@@ -35,29 +49,24 @@ class Alumna(models.Model):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
-    
+
     def get_cuota_actual(self):
         """Obtiene la cuota más reciente (mes/año actual o más cercano)"""
-        from datetime import datetime
         cuota_actual = self.cuotas.all().first()
         return cuota_actual
 
 
 class Cuota(models.Model):
-    MESES = [
-        (1, 'Enero'), (2, 'Febrero'), (3, 'Marzo'), (4, 'Abril'),
-        (5, 'Mayo'), (6, 'Junio'), (7, 'Julio'), (8, 'Agosto'),
-        (9, 'Septiembre'), (10, 'Octubre'), (11, 'Noviembre'), (12, 'Diciembre'),
-    ]
-    
+    MESES = MESES
+
     METODOS_PAGO = [
         ('efectivo', 'Efectivo'),
         ('transferencia', 'Transferencia'),
     ]
-    
+
     alumna = models.ForeignKey(Alumna, on_delete=models.CASCADE, related_name='cuotas')
     mes = models.IntegerField(choices=MESES)
-    anio = models.IntegerField(default=2026)
+    anio = models.IntegerField(default=anio_actual)
     monto = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     pagado = models.BooleanField(default=False)
     fecha_pago = models.DateField(null=True, blank=True)
@@ -70,7 +79,7 @@ class Cuota(models.Model):
 
     def __str__(self):
         return f"{self.alumna} - {self.get_mes_display()} {self.anio}"
-    
+
     def clean(self):
         # Validación adicional
         if self.mes < 1 or self.mes > 12:

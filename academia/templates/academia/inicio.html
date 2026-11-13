@@ -39,8 +39,25 @@
         </form>
 
         <!-- Resultados de Búsqueda -->
-        {% if alumna %}
+        {% if resultados %}
             <div class="result-section">
+                <h3 style="margin-bottom: 15px; color: var(--primary-dark); font-size: 18px; font-weight: 700;">
+                    🔎 {{ resultados|length }} alumnas coinciden con "{{ query }}"
+                </h3>
+                <div class="resultados-lista">
+                    {% for r in resultados %}
+                        <a href="?id={{ r.id }}&q={{ query|urlencode }}" class="resultado-item">
+                            <span class="resultado-nombre">{{ r.nombre }} {{ r.apellido }}</span>
+                            <span class="resultado-turno">⏰ {{ r.turno.nombre|default:"Sin turno" }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% elif alumna %}
+            <div class="result-section">
+                {% if query and request.GET.id %}
+                    <a href="?q={{ query|urlencode }}" class="volver-resultados">← Volver a los resultados de "{{ query }}"</a>
+                {% endif %}
                 <div class="alumna-info">
                     <div class="alumna-name">{{ alumna.nombre }} {{ alumna.apellido }}</div>
                     <div class="alumna-details">
