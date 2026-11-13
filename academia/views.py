@@ -211,7 +211,8 @@ def listar_alumnas(request):
     
     return render(request, 'academia/listar_alumnas.html', {
         'alumnas_por_turno': alumnas_por_turno,
-        'total_alumnas': Alumna.objects.count()
+        'total_alumnas': Alumna.objects.count(),
+        'turnos_activos': Turno.objects.filter(activo=True).count(),
     })
 
 
